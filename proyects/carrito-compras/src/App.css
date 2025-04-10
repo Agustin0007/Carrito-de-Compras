@@ -1,0 +1,228 @@
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+* {
+    box-sizing: border-box;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: bold;
+    margin: 0;
+    line-height: 1.8;
+    letter-spacing: 0.5px;
+}
+
+/* Estilos generales */
+:root {
+  --primary: #2196F3;
+  --success: #4CAF50;
+  --danger: #f44336;
+  --bg-dark: #121212;
+  --bg-card: #2d2d2d;
+  --bg-container: #1a1a1a;
+  --border: #333333;
+  --radius: 12px;
+  --transition: all 0.3s ease;
+}
+
+/* Estilos base */
+body {
+  background: var(--bg-dark);
+  color: white;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  margin: 0;
+}
+
+.App {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+
+/* Layout */
+.app-header {
+  background: linear-gradient(135deg, var(--border) 0%, var(--bg-container) 100%);
+  padding: 25px;
+  text-align: center;
+  margin-bottom: 30px;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  animation: fadeInDown 0.5s;
+}
+
+.app-main {
+  display: grid;
+  grid-template-columns: 2.5fr 1fr;
+  gap: 30px;
+  animation: fadeIn 0.5s;
+}
+
+/* Productos */
+.productos-container, .carrito {
+  padding: 25px;
+  background: var(--bg-container);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.filtros {
+  margin-bottom: 30px;
+  animation: slideInDown 0.5s;
+}
+
+.categoria-select {
+  padding: 12px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  width: 100%;
+  background: var(--bg-card);
+  color: white;
+  transition: var(--transition);
+}
+
+.categoria-select:hover {
+  border-color: var(--primary);
+}
+
+.productos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 25px;
+}
+
+/* Tarjetas */
+.producto-card {
+  padding: 20px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  text-align: center;
+  transition: var(--transition);
+  animation: fadeIn 0.5s;
+}
+
+.producto-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 20px rgba(0,0,0,0.4);
+}
+
+.producto-imagen-container {
+  position: relative;
+  padding-top: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.producto-imagen {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: var(--transition);
+}
+
+.producto-card:hover .producto-imagen {
+  transform: scale(1.05);
+}
+
+/* Carrito */
+.carrito-item {
+  display: flex;
+  padding: 15px;
+  border-bottom: 1px solid var(--border);
+  gap: 15px;
+}
+
+.carrito-item-imagen {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: var(--transition);
+}
+
+.cantidad-controles {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.cantidad-controles button {
+  background: var(--primary);
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+}
+
+/* Botones */
+.boton-agregar,
+.boton-checkout {
+  background: var(--success);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  width: 100%;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.boton-eliminar {
+  background: var(--danger);
+  color: white;
+  padding: 8px 15px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Notificaciones y mensajes */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--success);
+  color: white;
+  padding: 15px 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  animation: slideInRight 0.3s;
+  z-index: 1000;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .app-main {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .carrito-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
