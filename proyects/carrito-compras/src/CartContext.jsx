@@ -1,149 +1,113 @@
-// Importamos las herramientas necesarias de React:
-// createContext: Para crear el contexto del carrito
-// useState: Para manejar estados
-// useContext: Para usar el contexto
-// useEffect: Para efectos secundarios
 import { createContext, useState, useContext, useEffect } from 'react';
 
-// Creamos un nuevo contexto para el carrito
+// Creamos el contexto para el carrito de compras
 const CartContext = createContext();
 
-// Definimos el costo fijo de envío
+// Definimos el costo fijo de envío 
 const SHIPPING_COST = 10;
 
-// Componente principal que provee el contexto del carrito
-// children: Componentes hijos que tendrán acceso al contexto
+// Proveedor del contexto del carrito que maneja toda la lógica de compras
 export function CartProvider({ children }) {
-    // Estado para los items del carrito
-    // useState con función de inicialización para cargar datos del localStorage
+    // Inicializamos el carrito desde localStorage o como array vacío
     const [cartItems, setCartItems] = useState(() => {
-        // Intentamos obtener el carrito guardado en localStorage
-        const savedCart = localStorage.getItem('cart');
-        // Si existe, lo transformamos a objeto, si no, retornamos array vacío []
-        return savedCart ? JSON.parse(savedCart) : [];
+        try {
+            return JSON.parse(localStorage.getItem('cart')) || [];
+        } catch {
+            return [];
+        }
     });
 
-    // Estado para el precio total final
-    const [total, setTotal] = useState(0);
-    // Estado para el subtotal (suma de productos sin envío)
-    const [subtotal, setSubtotal] = useState(0);
+    // Estado combinado para total y subtotal para mejor manejo
+    const [{ total, subtotal }, setTotals] = useState({ total: 0, subtotal: 0 });
 
-    // useEffect se ejecuta cuando cambia cartItems
+    // Efecto para actualizar localStorage y recalcular totales cuando cambia el carrito
     useEffect(() => {
-        // Guardamos el carrito actualizado en localStorage
+        // Guardamos en localStorage
         localStorage.setItem('cart', JSON.stringify(cartItems));
-        // Recalculamos los totales
-        calculateTotals();
-    }, [cartItems]);
-
-    // Función para calcular subtotal y total
-    const calculateTotals = () => {
-        // Reduce el array de items a un único valor sumando precio * cantidad
-        const itemsSubtotal = cartItems.reduce((sum, item) => 
+        
+        // Calculamos el nuevo subtotal sumando (precio * cantidad) de cada item
+        const newSubtotal = cartItems.reduce((sum, item) => 
             sum + (item.precio * item.cantidad), 0
         );
         
-        // Calcula el total añadiendo el costo de envío
-        const finalTotal = itemsSubtotal + SHIPPING_COST;
+        // Actualizamos totales incluyendo envío
+        setTotals({
+            subtotal: newSubtotal,
+            total: newSubtotal + SHIPPING_COST
+        });
+    }, [cartItems]);
 
-        // Actualiza los estados
-        setSubtotal(itemsSubtotal);
-        setTotal(finalTotal);
-    };
-
-    // Función para agregar productos al carrito
+    // Añade un producto al carrito o incrementa su cantidad si ya existe
     const agregarAlCarrito = (producto) => {
-        setCartItems(prevItems => {
-            // Busca si el producto ya existe en el carrito
-            const existingItem = prevItems.find(item => item.id === producto.id);
-            if (existingItem) {
-                // Si existe, aumenta su cantidad en 1
-                return prevItems.map(item =>
-                    item.id === producto.id
-                        ? {...item, cantidad: item.cantidad + 1}
-                        : item
-                );
+        setCartItems(items => {
+            const index = items.findIndex(item => item.id === producto.id);
+            if (index >= 0) {
+                const newItems = [...items];
+                newItems[index] = { ...items[index], cantidad: items[index].cantidad + 1 };
+                return newItems;
             }
-            // Si no existe, lo agrega con cantidad 1
-            return [...prevItems, {...producto, cantidad: 1}];
+            return [...items, { ...producto, cantidad: 1 }];
         });
     };
 
-    // Función para eliminar un producto del carrito
+    // Elimina un producto específico del carrito
     const eliminarDelCarrito = (productoId) => {
-        // Filtra el array excluyendo el producto con el ID especificado
-        setCartItems(prevItems => 
-            prevItems.filter(item => item.id !== productoId)
+        setCartItems(items => items.filter(item => item.id !== productoId));
+    };
+
+    // Actualiza la cantidad de un producto específico
+    const actualizarCantidad = (productoId, nuevaCantidad) => {
+        if (nuevaCantidad <= 0) return;
+        setCartItems(items =>
+            items.map(item => 
+                item.id === productoId ? { ...item, cantidad: nuevaCantidad } : item
+            )
         );
     };
 
-    // Función para actualizar la cantidad de un producto
-    const actualizarCantidad = (productoId, nuevaCantidad) => {
-        // Solo actualiza si la nueva cantidad es mayor que 0
-        if (nuevaCantidad > 0) {
-            setCartItems(prevItems =>
-                prevItems.map(item =>
-                    item.id === productoId
-                        ? {...item, cantidad: nuevaCantidad}
-                        : item
-                )
-            );
-        }
-    };
+    // Vacía completamente el carrito
+    const limpiarCarrito = () => setCartItems([]);
 
-    // Función para vaciar el carrito
-    const limpiarCarrito = () => {
-        setCartItems([]);
-    };
-
-    // Función asíncrona para procesar el pago
-    const procesarPago = async () => {
-        // Crea objeto con detalles de la orden
-        const orden = {
-            items: cartItems,
-            subtotal,
-            envio: SHIPPING_COST,
-            total,
+    // Simula el proceso de pago (demo)
+    const procesarPago = () => {
+        const orden = { 
+            items: cartItems, 
+            subtotal, 
+            envio: SHIPPING_COST, 
+            total 
         };
-
-        // Simula proceso de pago con Promise y setTimeout
-        return new Promise((resolve) => {
+        
+        return new Promise(resolve => {
             setTimeout(() => {
                 limpiarCarrito();
                 resolve(orden);
-            }, 1500); // Delay de 1.5 segundos
+            }, 1500); // Simulamos un delay de procesamiento
         });
     };
 
-    // Objeto con todos los valores y funciones que estarán disponibles en el contexto
-    const value = {
-        cartItems,
-        total,
-        subtotal,
-        shipping: SHIPPING_COST,
-        agregarAlCarrito,
-        eliminarDelCarrito,
-        actualizarCantidad,
-        procesarPago,
-        limpiarCarrito
-    };
-
-    // Retorna el Provider del contexto con los valores
+    // Retornamos el Provider con todos los valores y funciones necesarias
     return (
-        <CartContext.Provider value={value}>
+        <CartContext.Provider value={{
+            cartItems,
+            total,
+            subtotal,
+            shipping: SHIPPING_COST,
+            agregarAlCarrito,
+            eliminarDelCarrito,
+            actualizarCantidad,
+            procesarPago,
+            limpiarCarrito
+        }}>
             {children}
         </CartContext.Provider>
     );
 }
 
-// Hook personalizado para usar el contexto del carrito
+// Hook personalizado para acceder al contexto del carrito desde cualquier componente
 export const useCart = () => {
-    // Obtiene el contexto
     const context = useContext(CartContext);
-    // Si no existe el contexto, significa que se está usando fuera del Provider
     if (!context) {
         throw new Error('useCart debe usarse dentro de un CartProvider');
     }
-    // Retorna el contexto
     return context;
 };
