@@ -1,9 +1,9 @@
 import { CartProvider } from './CartContext'
 import { Cart } from './Cart'
-import { ProductList } from './ProductList'  // Corregimos la ruta de importación
+import { ProductList } from './ProductList'
 import './App.css'
 
-export function App() {
+export default function App() {
   return (
     <CartProvider>
       <div className="App">

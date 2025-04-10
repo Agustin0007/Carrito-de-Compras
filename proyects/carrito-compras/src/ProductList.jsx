@@ -23,7 +23,7 @@ const productosDisponibles = [
     {
         id: 3,
         nombre: "iPhone 16",
-        precio: 800,
+        precio: 950,
         imagen: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
         descripcion: "6.1' Super Retina XDR, A18, 512GB",
         categoria: "iPhone"
